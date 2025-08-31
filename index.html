@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Shape Shifter Website</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Optional: For a nice icon for the toggle button -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Main Website Content Area -->
+        <main id="website-content">
+            <!-- Default content or dynamically generated content will go here -->
+            <header id="default-header" class="section header-section">
+                <div class="container-inner">
+                    <h1 class="site-title">ShapeShift AI</h1>
+                    <nav>
+                        <ul>
+                            <li><a href="#">Home</a></li>
+                            <li><a href="#">About</a></li>
+                            <li><a href="#">Services</a></li>
+                            <li><a href="#">Contact</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </header>
+
+            <section id="default-hero" class="section hero-section">
+                <div class="container-inner">
+                    <h2>Your Vision, Our Canvas</h2>
+                    <p>Tell me what you want, and I'll build your website instantly.</p>
+                    <button class="btn primary-btn">Get Started</button>
+                </div>
+            </section>
+
+            <section id="default-about" class="section text-section">
+                <div class="container-inner">
+                    <h3>About This Project</h3>
+                    <p>This is an AI-powered website builder. Interact with the chatbot to add sections, change styles, and customize your site. All changes are saved locally!</p>
+                </div>
+            </section>
+
+            <footer id="default-footer" class="section footer-section">
+                <div class="container-inner">
+                    <p>&copy; 2023 ShapeShift AI. All rights reserved.</p>
+                </div>
+            </footer>
+        </main>
+
+        <!-- Chatbot Interface -->
+        <aside id="chatbot-container">
+            <div class="chatbot-header">
+                <h3>AI Design Assistant</h3>
+                <div class="chatbot-controls">
+                    <button id="reset-website-btn" class="btn reset-btn">Reset Website</button>
+                    <button id="chatbot-toggle-btn" class="btn toggle-btn">
+                        <i class="fas fa-minus"></i> <!-- Minus icon for open state -->
+                    </button>
+                </div>
+            </div>
+            <div id="chat-history" class="chat-history">
+                <div class="message bot-message">
+                    <p>Hello! I'm your AI design assistant. How can I help you shape your website today?</p>
+                    <p>Try asking me to:
+                        <ul>
+                            <li>"Add a hero section with a blue background."</li>
+                            <li>"Change the main background color to light gray."</li>
+                            <li>"Make the header text white."</li>
+                            <li>"Add an image gallery."</li>
+                            <li>"Remove the about section."</li>
+                            <li>"Change the hero title to 'Welcome to My Dynamic Site'."</li>
+                        </ul>
+                    </p>
+                    <p>You can also minimize/maximize me using the button above!</p>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="user-input" placeholder="Type your design request...">
+                <button id="send-btn" class="btn send-btn">Send</button>
+            </div>
+        </aside>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
