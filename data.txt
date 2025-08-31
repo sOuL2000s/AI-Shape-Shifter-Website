@@ -1228,4 +1228,4 @@ body {
 
 ---------------------------------------------------------------------------------------------
 
-make the website more responsive and smooth, improve the user experience, add ai chatbot creativity temperature controller, fix the chatbot open and close behavior.
+make the website more responsive and smooth, improve the user experience, add ai chatbot creativity controller, fix the chatbot open and close behavior. Make the chatbot creative and intelligent. 
