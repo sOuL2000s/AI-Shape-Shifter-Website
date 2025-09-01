@@ -432,7 +432,7 @@ body {
 }
 
 #chatbot-container.chatbot-minimized .chatbot-header h3 {
-    display: none; /* Hide title */
+    display: none; /* Hide title by default when minimized on desktop */
 }
 
 #chatbot-container.chatbot-minimized .chatbot-controls {
