@@ -1,6 +1,6 @@
 // Gemini API Configuration
 const API_KEY = "AIzaSyCzx6ReMk8ohPJcCjGwHHzu7SvFccJqAbA"; // Your Gemini API Key
-const MODEL_NAME = "gemini-2.5-flash-preview-05-20";
+const MODEL_NAME = "gemini-2.5-flash-preview-09-2025";
 
 // DOM Elements
 const websiteContent = document.getElementById('website-content');

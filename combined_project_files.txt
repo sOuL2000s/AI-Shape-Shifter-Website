@@ -1,1304 +1,4 @@
 
---- START FILE: combine_project.py ---
-
-import os
-
-def combine_files_to_single_file(root_dir, output_filename="combined_project_files.txt"):
-    """
-    Combines the content of all files in a directory into a single file,
-    excluding 'node_modules' directories and 'package-lock.json' files.
-
-    Args:
-        root_dir (str): The root directory of the project.
-        output_filename (str): The name of the output file.
-    """
-    combined_content = []
-    excluded_dirs = ['node_modules', '.git', '.vscode', '.idea', 'dist', 'build']
-    excluded_files = ['package-lock.json', 'yarn.lock', 'bun.lockb', '.env'] # Added .env as it might contain sensitive info
-
-    print(f"Starting to combine files from: {root_dir}")
-    print(f"Excluding directories: {excluded_dirs}")
-    print(f"Excluding files: {excluded_files}")
-
-    for dirpath, dirnames, filenames in os.walk(root_dir):
-        # Modify dirnames in-place to skip excluded directories
-        dirnames[:] = [d for d in dirnames if d not in excluded_dirs]
-
-        for filename in filenames:
-            if filename in excluded_files:
-                print(f"Skipping excluded file: {os.path.join(dirpath, filename)}")
-                continue
-
-            file_path = os.path.join(dirpath, filename)
-            # Make path relative to root_dir for the header
-            relative_file_path = os.path.relpath(file_path, root_dir)
-
-            try:
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                
-                combined_content.append(f"\n--- START FILE: {relative_file_path} ---\n\n")
-                combined_content.append(content)
-                combined_content.append(f"\n\n--- END FILE: {relative_file_path} ---\n")
-                print(f"Included file: {relative_file_path}")
-            except UnicodeDecodeError:
-                print(f"Skipping binary or undecodable file (UnicodeDecodeError): {relative_file_path}")
-            except Exception as e:
-                print(f"Error reading file {relative_file_path}: {e}")
-
-    output_path = os.path.join(root_dir, output_filename)
-    try:
-        with open(output_path, 'w', encoding='utf-8') as outfile:
-            outfile.write("".join(combined_content))
-        print(f"\nSuccessfully combined all files into: {output_path}")
-    except Exception as e:
-        print(f"Error writing output file {output_path}: {e}")
-
-if __name__ == "__main__":
-    # Get the current working directory where the script is run
-    # This assumes you run the script from your project's root directory
-    project_root = os.getcwd()
-    combine_files_to_single_file(project_root)
-
-
---- END FILE: combine_project.py ---
-
---- START FILE: data.txt ---
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Shape Shifter Website</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- Optional: For a nice icon for the toggle button -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
-<body>
-    <div class="container">
-        <!-- Main Website Content Area -->
-        <main id="website-content">
-            <!-- Default content or dynamically generated content will go here -->
-            <header id="default-header" class="section header-section">
-                <div class="container-inner">
-                    <h1 class="site-title">ShapeShift AI</h1>
-                    <nav>
-                        <ul>
-                            <li><a href="#">Home</a></li>
-                            <li><a href="#">About</a></li>
-                            <li><a href="#">Services</a></li>
-                            <li><a href="#">Contact</a></li>
-                        </ul>
-                    </nav>
-                </div>
-            </header>
-
-            <section id="default-hero" class="section hero-section">
-                <div class="container-inner">
-                    <h2>Your Vision, Our Canvas</h2>
-                    <p>Tell me what you want, and I'll build your website instantly.</p>
-                    <button class="btn primary-btn">Get Started</button>
-                </div>
-            </section>
-
-            <section id="default-about" class="section text-section">
-                <div class="container-inner">
-                    <h3>About This Project</h3>
-                    <p>This is an AI-powered website builder. Interact with the chatbot to add sections, change styles, and customize your site. All changes are saved locally!</p>
-                </div>
-            </section>
-
-            <footer id="default-footer" class="section footer-section">
-                <div class="container-inner">
-                    <p>&copy; 2023 ShapeShift AI. All rights reserved.</p>
-                </div>
-            </footer>
-        </main>
-
-        <!-- Chatbot Interface -->
-        <aside id="chatbot-container">
-            <div class="chatbot-header">
-                <h3>AI Design Assistant</h3>
-                <div class="chatbot-controls">
-                    <button id="reset-website-btn" class="btn reset-btn">Reset Website</button>
-                    <button id="chatbot-toggle-btn" class="btn toggle-btn">
-                        <i class="fas fa-minus"></i> <!-- Minus icon for open state -->
-                    </button>
-                </div>
-            </div>
-            <div id="chat-history" class="chat-history">
-                <div class="message bot-message">
-                    <p>Hello! I'm your AI design assistant. How can I help you shape your website today?</p>
-                    <p>Try asking me to:
-                        <ul>
-                            <li>"Add a hero section with a blue background."</li>
-                            <li>"Change the main background color to light gray."</li>
-                            <li>"Make the header text white."</li>
-                            <li>"Add an image gallery."</li>
-                            <li>"Remove the about section."</li>
-                            <li>"Change the hero title to 'Welcome to My Dynamic Site'."</li>
-                        </ul>
-                    </p>
-                    <p>You can also minimize/maximize me using the button above!</p>
-                </div>
-            </div>
-            <div class="chat-input-area">
-                <input type="text" id="user-input" placeholder="Type your design request...">
-                <button id="send-btn" class="btn send-btn">Send</button>
-            </div>
-        </aside>
-    </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
-
-// Gemini API Configuration
-const API_KEY = "AIzaSyCzx6ReMk8ohPJcCjGwHHzu7SvFccJqAbA"; // Your Gemini API Key
-const MODEL_NAME = "gemini-2.5-flash-preview-05-20";
-
-// DOM Elements
-const websiteContent = document.getElementById('website-content');
-const chatHistory = document.getElementById('chat-history');
-const userInput = document.getElementById('user-input');
-const sendBtn = document.getElementById('send-btn');
-const resetWebsiteBtn = document.getElementById('reset-website-btn');
-const chatbotContainer = document.getElementById('chatbot-container'); // Get chatbot container
-const chatbotToggleBtn = document.getElementById('chatbot-toggle-btn'); // Get toggle button
-
-// --- Website State Management ---
-let websiteConfig = {
-    sections: [
-        { id: 'default-header', type: 'header', content: { title: 'ShapeShift AI', nav: ['Home', 'About', 'Services', 'Contact'] }, styles: {} },
-        { id: 'default-hero', type: 'hero', content: { title: 'Your Vision, Our Canvas', subtitle: 'Tell me what you want, and I\'ll build your website instantly.', buttonText: 'Get Started' }, styles: {} },
-        { id: 'default-about', type: 'text', content: { title: 'About This Project', text: 'This is an AI-powered website builder. Interact with the chatbot to add sections, change styles, and customize your site. All changes are saved locally!' }, styles: {} },
-        { id: 'default-footer', type: 'footer', content: { text: '&copy; 2023 ShapeShift AI. All rights reserved.' }, styles: {} }
-    ],
-    globalStyles: {
-        '--primary-color': '#007bff',
-        '--secondary-color': '#6c757d',
-        '--accent-color': '#28a745',
-        '--background-color': '#f8f9fa',
-        '--text-color': '#343a40',
-        '--header-bg': '#343a40',
-        '--header-text': '#ffffff',
-        '--footer-bg': '#343a40',
-        '--footer-text': '#ffffff',
-        '--card-bg': '#ffffff',
-        '--border-color': '#dee2e6',
-        '--font-family': "'Poppins', sans-serif",
-        '--chatbot-bg': '#ffffff',
-        '--chatbot-border': '#e9ecef',
-        '--bot-message-bg': '#e2f0ff',
-        '--user-message-bg': '#d4edda',
-    }
-};
-
-// --- Helper Functions for Website Rendering ---
-
-function generateUniqueId(prefix = 'section') {
-    return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-function applyStyles(element, styles) {
-    for (const prop in styles) {
-        if (styles.hasOwnProperty(prop)) {
-            element.style[prop] = styles[prop];
-        }
-    }
-}
-
-function createHeader(config) {
-    const header = document.createElement('header');
-    header.id = config.id;
-    header.className = 'section header-section';
-    applyStyles(header, config.styles);
-
-    header.innerHTML = `
-        <div class="container-inner">
-            <h1 class="site-title">${config.content.title}</h1>
-            <nav>
-                <ul>
-                    ${config.content.nav.map(item => `<li><a href="#">${item}</a></li>`).join('')}
-                </ul>
-            </nav>
-        </div>
-    `;
-    return header;
-}
-
-function createHero(config) {
-    const section = document.createElement('section');
-    section.id = config.id;
-    section.className = 'section hero-section';
-    applyStyles(section, config.styles);
-
-    section.innerHTML = `
-        <div class="container-inner">
-            <h2>${config.content.title}</h2>
-            <p>${config.content.subtitle}</p>
-            <button class="btn primary-btn">${config.content.buttonText}</button>
-        </div>
-    `;
-    return section;
-}
-
-function createText(config) {
-    const section = document.createElement('section');
-    section.id = config.id;
-    section.className = 'section text-section';
-    applyStyles(section, config.styles);
-
-    section.innerHTML = `
-        <div class="container-inner">
-            <h3>${config.content.title}</h3>
-            <p>${config.content.text}</p>
-        </div>
-    `;
-    return section;
-}
-
-function createImageGallery(config) {
-    const section = document.createElement('section');
-    section.id = config.id;
-    section.className = 'section gallery-section';
-    applyStyles(section, config.styles);
-
-    section.innerHTML = `
-        <div class="container-inner">
-            <h3>${config.content.title}</h3>
-            <div class="gallery-grid">
-                ${config.content.images.map(img => `
-                    <div class="gallery-item">
-                        <img src="${img.src}" alt="${img.alt}">
-                        <p>${img.caption}</p>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `;
-    return section;
-}
-
-function createFooter(config) {
-    const footer = document.createElement('footer');
-    footer.id = config.id;
-    footer.className = 'section footer-section';
-    applyStyles(footer, config.styles);
-
-    footer.innerHTML = `
-        <div class="container-inner">
-            <p>${config.content.text}</p>
-        </div>
-    `;
-    return footer;
-}
-
-// Map section types to their creation functions
-const sectionCreators = {
-    'header': createHeader,
-    'hero': createHero,
-    'text': createText,
-    'image-gallery': createImageGallery,
-    'footer': createFooter
-};
-
-function renderWebsite() {
-    websiteContent.innerHTML = ''; // Clear existing content
-    websiteConfig.sections.forEach(sectionConfig => {
-        const creator = sectionCreators[sectionConfig.type];
-        if (creator) {
-            websiteContent.appendChild(creator(sectionConfig));
-        }
-    });
-
-    // Apply global styles
-    for (const prop in websiteConfig.globalStyles) {
-        if (websiteConfig.globalStyles.hasOwnProperty(prop)) {
-            document.documentElement.style.setProperty(prop, websiteConfig.globalStyles[prop]);
-        }
-    }
-    saveWebsiteState();
-}
-
-function saveWebsiteState() {
-    localStorage.setItem('websiteConfig', JSON.stringify(websiteConfig));
-}
-
-function loadWebsiteState() {
-    const savedConfig = localStorage.getItem('websiteConfig');
-    if (savedConfig) {
-        websiteConfig = JSON.parse(savedConfig);
-    }
-    renderWebsite();
-}
-
-function resetWebsite() {
-    localStorage.removeItem('websiteConfig');
-    // Re-initialize with default config
-    websiteConfig = {
-        sections: [
-            { id: 'default-header', type: 'header', content: { title: 'ShapeShift AI', nav: ['Home', 'About', 'Services', 'Contact'] }, styles: {} },
-            { id: 'default-hero', type: 'hero', content: { title: 'Your Vision, Our Canvas', subtitle: 'Tell me what you want, and I\'ll build your website instantly.', buttonText: 'Get Started' }, styles: {} },
-            { id: 'default-about', type: 'text', content: { title: 'About This Project', text: 'This is an AI-powered website builder. Interact with the chatbot to add sections, change styles, and customize your site. All changes are saved locally!' }, styles: {} },
-            { id: 'default-footer', type: { text: '&copy; 2023 ShapeShift AI. All rights reserved.' }, styles: {} } // Fixed: content was missing
-        ],
-        globalStyles: {
-            '--primary-color': '#007bff',
-            '--secondary-color': '#6c757d',
-            '--accent-color': '#28a745',
-            '--background-color': '#f8f9fa',
-            '--text-color': '#343a40',
-            '--header-bg': '#343a40',
-            '--header-text': '#ffffff',
-            '--footer-bg': '#343a40',
-            '--footer-text': '#ffffff',
-            '--card-bg': '#ffffff',
-            '--border-color': '#dee2e6',
-            '--font-family': "'Poppins', sans-serif",
-            '--chatbot-bg': '#ffffff',
-            '--chatbot-border': '#e9ecef',
-            '--bot-message-bg': '#e2f0ff',
-            '--user-message-bg': '#d4edda',
-        }
-    };
-    renderWebsite();
-    addBotMessage("Website has been reset to its default state.");
-}
-
-// --- Chatbot UI Functions ---
-
-function addMessage(sender, text) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${sender}-message`;
-    messageDiv.innerHTML = `<p>${text}</p>`;
-    chatHistory.appendChild(messageDiv);
-    chatHistory.scrollTop = chatHistory.scrollHeight; // Auto-scroll to bottom
-}
-
-function addUserMessage(text) {
-    addMessage('user', text);
-}
-
-function addBotMessage(text) {
-    addMessage('bot', text);
-}
-
-function showLoading() {
-    const loadingDiv = document.createElement('div');
-    loadingDiv.className = 'message bot-message loading-dots';
-    loadingDiv.innerHTML = '<span></span><span></span><span></span>';
-    loadingDiv.id = 'loading-indicator';
-    chatHistory.appendChild(loadingDiv);
-    chatHistory.scrollTop = chatHistory.scrollHeight;
-}
-
-function hideLoading() {
-    const loadingDiv = document.getElementById('loading-indicator');
-    if (loadingDiv) {
-        loadingDiv.remove();
-    }
-}
-
-// --- Gemini API Interaction ---
-
-async function sendMessageToGemini(message) {
-    showLoading();
-    try {
-        const websiteConfigJson = JSON.stringify(websiteConfig, null, 2);
-        // Escape backticks within the stringified JSON to prevent premature template literal termination
-        const escapedWebsiteConfigForPrompt = websiteConfigJson.replace(/`/g, '\\`');
-
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: `You are an AI website design assistant. Your goal is to help the user build and modify their website.
-                        The user will describe changes they want. You must respond with a JSON object containing instructions for the frontend JavaScript to execute.
-                        
-                        Here are the available actions and their JSON formats:
-
-                        1.  **Add a new section:**
-                            \`\`\`json
-                            {
-                                "action": "addSection",
-                                "type": "header" | "hero" | "text" | "image-gallery" | "footer",
-                                "position": "top" | "bottom" | "before:[sectionId]" | "after:[sectionId]", // Optional, default "bottom"
-                                "content": { ... }, // Content specific to the section type
-                                "styles": { ... } // CSS properties for the section
-                            }
-                            \`\`\`
-                            *   **header content:** '{ "title": "Site Name", "nav": ["Link1", "Link2"] }'
-                            *   **hero content:** '{ "title": "Main Title", "subtitle": "Sub text", "buttonText": "Action" }'
-                            *   **text content:** '{ "title": "Section Title", "text": "Paragraph content" }'
-                            *   **image-gallery content:** '{ "title": "Gallery Title", "images": [{ "src": "url", "alt": "desc", "caption": "text" }] }'
-                            *   **footer content:** '{ "text": "Copyright info" }'
-
-                        2.  **Update an existing section:**
-                            \`\`\`json
-                            {
-                                "action": "updateSection",
-                                "id": "[sectionId]", // The ID of the section to update (e.g., "default-hero")
-                                "content": { ... }, // Partial content to update
-                                "styles": { ... } // Partial CSS properties to update
-                            }
-                            \`\`\`
-
-                        3.  **Remove a section:**
-                            \`\`\`json
-                            {
-                                "action": "removeSection",
-                                "id": "[sectionId]" // The ID of the section to remove
-                            }
-                            \`\`\`
-
-                        4.  **Update global CSS variables:**
-                            \`\`\`json
-                            {
-                                "action": "updateGlobalStyles",
-                                "styles": {
-                                    "--variable-name": "value",
-                                    "--another-variable": "another-value"
-                                }
-                            }
-                            \`\`\`
-                            *   Common variables: '--primary-color', '--background-color', '--text-color', '--header-bg', '--header-text', '--font-family'.
-
-                        5.  **Acknowledge/Inform (if no direct modification is needed or possible):**
-                            \`\`\`json
-                            {
-                                "action": "inform",
-                                "message": "Your request has been noted, but no direct modification was applied."
-                            }
-                            \`\`\`
-
-                        **Important Rules:**
-                        *   Always respond with a single, valid JSON object.
-                        *   Do not include any text outside the JSON object.
-                        *   If a section ID is not provided for update/remove, try to infer it from the request (e.g., "the hero section" implies "default-hero"). If unsure, ask for clarification or use "inform".
-                        *   For image galleries, use placeholder image URLs like 'https://via.placeholder.com/300x200?text=Image1'
-                        *   When adding a section, generate a unique ID for it.
-                        *   If the user asks for a color, try to use a valid CSS color name or hex code.
-                        *   If the user asks to change a font, provide a valid CSS font-family string.
-
-                        **Current Website Configuration (for context, do not modify this directly):**
-                        ${escapedWebsiteConfigForPrompt}
-
-                        User request: ${message}`
-                    }]
-                }]
-            })
-        });
-
-        const data = await response.json();
-        hideLoading();
-
-        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
-            let botResponseText = data.candidates[0].content.parts[0].text; // Use 'let' to allow re-assignment
-            console.log("Gemini Raw Response:", botResponseText); // Debugging
-
-            // --- NEW FIX: Strip Markdown code block if present ---
-            // This regex looks for a string starting with ```json (or just ```)
-            // followed by any characters (non-greedy), and ending with ```
-            const jsonCodeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/;
-            const match = botResponseText.match(jsonCodeBlockRegex);
-
-            if (match && match[1]) {
-                botResponseText = match[1].trim(); // Extract the content inside the code block and trim whitespace
-                console.log("Gemini Cleaned JSON:", botResponseText); // Debugging
-            }
-            // --- END NEW FIX ---
-
-            try {
-                const instruction = JSON.parse(botResponseText);
-                applyGeminiInstruction(instruction);
-            } catch (jsonError) {
-                console.error("Failed to parse Gemini's JSON response:", jsonError);
-                addBotMessage("I received a response, but it wasn't in the expected format. Could you please rephrase your request?");
-                addBotMessage(`Raw response: <pre>${botResponseText}</pre>`); // Show raw for debugging
-            }
-        } else {
-            addBotMessage("I couldn't get a clear response from the AI. Please try again.");
-            console.error("Gemini API response structure unexpected:", data);
-        }
-
-    } catch (error) {
-        hideLoading();
-        console.error("Error communicating with Gemini API:", error);
-        addBotMessage("Oops! Something went wrong while talking to the AI. Please check your API key or try again later.");
-    }
-}
-
-// --- Apply Gemini Instructions to Website State ---
-
-function applyGeminiInstruction(instruction) {
-    let botMessage = "Okay, I've made some changes to your website!";
-
-    switch (instruction.action) {
-        case 'addSection':
-            const newId = generateUniqueId(instruction.type);
-            const newSection = {
-                id: newId,
-                type: instruction.type,
-                content: instruction.content || {},
-                styles: instruction.styles || {}
-            };
-
-            let insertIndex = websiteConfig.sections.length; // Default to bottom
-
-            if (instruction.position) {
-                if (instruction.position === 'top') {
-                    insertIndex = 0;
-                } else if (instruction.position === 'bottom') {
-                    insertIndex = websiteConfig.sections.length;
-                } else if (instruction.position.startsWith('before:')) {
-                    const targetId = instruction.position.split(':')[1];
-                    const targetIndex = websiteConfig.sections.findIndex(s => s.id === targetId);
-                    if (targetIndex !== -1) insertIndex = targetIndex;
-                } else if (instruction.position.startsWith('after:')) {
-                    const targetId = instruction.position.split(':')[1];
-                    const targetIndex = websiteConfig.sections.findIndex(s => s.id === targetId);
-                    if (targetIndex !== -1) insertIndex = targetIndex + 1;
-                }
-            }
-            websiteConfig.sections.splice(insertIndex, 0, newSection);
-            botMessage = `Added a new ${instruction.type} section (ID: ${newId}).`;
-            break;
-
-        case 'updateSection':
-            const sectionToUpdate = websiteConfig.sections.find(s => s.id === instruction.id);
-            if (sectionToUpdate) {
-                if (instruction.content) {
-                    sectionToUpdate.content = { ...sectionToUpdate.content, ...instruction.content };
-                }
-                if (instruction.styles) {
-                    sectionToUpdate.styles = { ...sectionToUpdate.styles, ...instruction.styles };
-                }
-                botMessage = `Updated section with ID: ${instruction.id}.`;
-            } else {
-                botMessage = `Could not find a section with ID: ${instruction.id} to update.`;
-            }
-            break;
-
-        case 'removeSection':
-            const initialLength = websiteConfig.sections.length;
-            websiteConfig.sections = websiteConfig.sections.filter(s => s.id !== instruction.id);
-            if (websiteConfig.sections.length < initialLength) {
-                botMessage = `Removed section with ID: ${instruction.id}.`;
-            } else {
-                botMessage = `Could not find a section with ID: ${instruction.id} to remove.`;
-            }
-            break;
-
-        case 'updateGlobalStyles':
-            if (instruction.styles) {
-                websiteConfig.globalStyles = { ...websiteConfig.globalStyles, ...instruction.styles };
-                botMessage = "Applied global style changes.";
-            } else {
-                botMessage = "No global styles provided to update.";
-            }
-            break;
-
-        case 'inform':
-            botMessage = instruction.message;
-            break;
-
-        default:
-            botMessage = "I'm not sure how to interpret that instruction. Please try a different request.";
-            break;
-    }
-
-    renderWebsite(); // Re-render the entire website after changes
-    addBotMessage(botMessage);
-}
-
-// --- Event Listeners ---
-
-sendBtn.addEventListener('click', () => {
-    const message = userInput.value.trim();
-    if (message) {
-        addUserMessage(message);
-        sendMessageToGemini(message);
-        userInput.value = '';
-    }
-});
-
-userInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        sendBtn.click();
-    }
-});
-
-resetWebsiteBtn.addEventListener('click', resetWebsite);
-
-// --- Chatbot Toggle Logic ---
-chatbotToggleBtn.addEventListener('click', () => {
-    chatbotContainer.classList.toggle('chatbot-minimized');
-    const isMinimized = chatbotContainer.classList.contains('chatbot-minimized');
-    const toggleIcon = chatbotToggleBtn.querySelector('i');
-
-    if (isMinimized) {
-        toggleIcon.classList.remove('fa-minus');
-        toggleIcon.classList.add('fa-comment-dots'); // Or fa-plus, fa-message, etc.
-        chatbotToggleBtn.title = "Maximize Chatbot";
-    } else {
-        toggleIcon.classList.remove('fa-comment-dots');
-        toggleIcon.classList.add('fa-minus');
-        chatbotToggleBtn.title = "Minimize Chatbot";
-        chatHistory.scrollTop = chatHistory.scrollHeight; // Scroll to bottom when opened
-    }
-});
-
-
-// --- Initial Load ---
-document.addEventListener('DOMContentLoaded', loadWebsiteState);
-
-/* Global Styles */
-:root {
-    --primary-color: #007bff; /* Blue */
-    --secondary-color: #6c757d; /* Gray */
-    --accent-color: #28a745; /* Green */
-    --background-color: #f8f9fa; /* Light Gray */
-    --text-color: #343a40; /* Dark Gray */
-    --header-bg: #343a40; /* Dark Header */
-    --header-text: #ffffff; /* White Header Text */
-    --footer-bg: #343a40; /* Dark Footer */
-    --footer-text: #ffffff; /* White Footer Text */
-    --card-bg: #ffffff;
-    --border-color: #dee2e6;
-    --font-family: 'Poppins', sans-serif;
-    --chatbot-bg: #ffffff;
-    --chatbot-border: #e9ecef;
-    --bot-message-bg: #e2f0ff; /* Light blue for bot */
-    --user-message-bg: #d4edda; /* Light green for user */
-    --chatbot-width-desktop: 380px; /* New CSS variable for chatbot width */
-    --chatbot-height-desktop: 550px; /* New CSS variable for chatbot height */
-    --chatbot-minimized-height: 60px; /* Height when minimized */
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: var(--font-family);
-    line-height: 1.6;
-    color: var(--text-color);
-    background-color: var(--background-color);
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Align to top */
-    min-height: 100vh;
-    padding: 20px;
-    overflow-x: hidden; /* Prevent horizontal scroll */
-}
-
-.container {
-    /* Removed flex properties from here as chatbot is now fixed */
-    width: 100%;
-    max-width: 1200px; /* Max width for the main content area */
-    background-color: var(--card-bg);
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    position: relative; /* Needed for potential future absolute positioning of elements within main content */
-    min-height: 80vh; /* Ensure container has some height */
-}
-
-/* Main Website Content Area */
-#website-content {
-    width: 100%; /* Takes full width of its parent container */
-    min-height: 80vh;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto; /* Scrollable if content is too long */
-    background-color: var(--background-color); /* Default background for content */
-    padding-right: calc(var(--chatbot-width-desktop) + 40px); /* Add padding to prevent content overlap with chatbot */
-    transition: padding-right 0.3s ease; /* Smooth transition for padding */
-}
-
-/* When chatbot is minimized, reduce padding */
-#chatbot-container.chatbot-minimized + #website-content {
-    padding-right: 20px; /* Or whatever default padding you want */
-}
-
-
-.container-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-/* Section Styling (remains mostly the same) */
-.section {
-    padding: 60px 0;
-    text-align: center;
-    transition: all 0.3s ease-in-out;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Subtle separator */
-}
-
-.section:last-child {
-    border-bottom: none;
-}
-
-.section h1, .section h2, .section h3 {
-    margin-bottom: 20px;
-    font-weight: 600;
-    color: var(--text-color);
-}
-
-.section p {
-    margin-bottom: 15px;
-    font-size: 1.1em;
-    line-height: 1.8;
-}
-
-/* Header Section */
-.header-section {
-    background-color: var(--header-bg);
-    color: var(--header-text);
-    padding: 20px 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    text-align: left;
-}
-
-.header-section .container-inner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-.header-section .site-title {
-    margin: 0;
-    font-size: 1.8em;
-    font-weight: 700;
-    color: var(--header-text);
-}
-
-.header-section nav ul {
-    list-style: none;
-    display: flex;
-    gap: 25px;
-}
-
-.header-section nav a {
-    color: var(--header-text);
-    text-decoration: none;
-    font-weight: 400;
-    transition: color 0.3s ease;
-}
-
-.header-section nav a:hover {
-    color: var(--primary-color);
-}
-
-/* Hero Section */
-.hero-section {
-    background: linear-gradient(135deg, var(--primary-color) 0%, #6a0dad 100%); /* Purple-blue gradient */
-    color: #ffffff;
-    padding: 100px 0;
-}
-
-.hero-section h2 {
-    font-size: 3em;
-    font-weight: 700;
-    margin-bottom: 25px;
-    color: #ffffff;
-}
-
-.hero-section p {
-    font-size: 1.3em;
-    margin-bottom: 30px;
-    opacity: 0.9;
-}
-
-/* Text Section */
-.text-section {
-    background-color: var(--card-bg);
-    color: var(--text-color);
-    padding: 80px 0;
-}
-
-.text-section h3 {
-    font-size: 2.2em;
-    color: var(--primary-color);
-}
-
-/* Image Gallery Section */
-.gallery-section {
-    background-color: var(--background-color);
-    padding: 80px 0;
-}
-
-.gallery-section h3 {
-    font-size: 2.2em;
-    color: var(--primary-color);
-    margin-bottom: 40px;
-}
-
-.gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-.gallery-item {
-    background-color: var(--card-bg);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease;
-}
-
-.gallery-item:hover {
-    transform: translateY(-5px);
-}
-
-.gallery-item img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    display: block;
-}
-
-.gallery-item p {
-    padding: 15px;
-    font-size: 0.95em;
-    color: var(--text-color);
-    margin: 0;
-}
-
-/* Footer Section */
-.footer-section {
-    background-color: var(--footer-bg);
-    color: var(--footer-text);
-    padding: 40px 0;
-    font-size: 0.9em;
-}
-
-.footer-section p {
-    margin: 0;
-    color: var(--footer-text);
-}
-
-/* Buttons */
-.btn {
-    display: inline-block;
-    padding: 12px 25px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: none;
-    font-size: 1em;
-}
-
-.primary-btn {
-    background-color: var(--primary-color);
-    color: #ffffff;
-}
-
-.primary-btn:hover {
-    background-color: #0056b3;
-    transform: translateY(-2px);
-}
-
-.reset-btn {
-    background-color: var(--secondary-color);
-    color: #ffffff;
-    padding: 8px 15px;
-    font-size: 0.9em;
-}
-
-.reset-btn:hover {
-    background-color: #5a6268;
-}
-
-.send-btn {
-    background-color: var(--accent-color);
-    color: #ffffff;
-    padding: 10px 20px;
-}
-
-.send-btn:hover {
-    background-color: #218838;
-}
-
-.toggle-btn {
-    background-color: var(--primary-color);
-    color: #ffffff;
-    padding: 8px 12px;
-    font-size: 1em;
-    border-radius: 50%; /* Make it round */
-    width: 40px; /* Fixed width for round button */
-    height: 40px; /* Fixed height for round button */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-.toggle-btn:hover {
-    background-color: #0056b3;
-}
-
-
-/* Chatbot Interface - FLOATING & RESPONSIVE */
-#chatbot-container {
-    position: fixed; /* Makes it float */
-    bottom: 20px;
-    right: 20px;
-    width: var(--chatbot-width-desktop);
-    max-height: var(--chatbot-height-desktop);
-    background-color: var(--chatbot-bg);
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    z-index: 1000; /* Ensure it's above other content */
-    transition: all 0.3s ease-in-out; /* Smooth transitions for size/position */
-    overflow: hidden; /* Hide content when minimized */
-}
-
-.chatbot-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid var(--chatbot-border);
-}
-
-.chatbot-header h3 {
-    margin: 0;
-    color: var(--primary-color);
-    font-weight: 600;
-}
-
-.chatbot-controls {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.chat-history {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding-right: 10px; /* For scrollbar */
-    margin-bottom: 20px;
-    transition: opacity 0.3s ease;
-}
-
-.message {
-    margin-bottom: 15px;
-    padding: 12px 18px;
-    border-radius: 18px;
-    max-width: 85%;
-    word-wrap: break-word;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-}
-
-.message p {
-    margin: 0;
-    font-size: 0.95em;
-}
-
-.message ul {
-    list-style-type: disc;
-    padding-left: 20px;
-    margin-top: 10px;
-}
-
-.message li {
-    margin-bottom: 5px;
-}
-
-.bot-message {
-    background-color: var(--bot-message-bg);
-    color: var(--text-color);
-    align-self: flex-start;
-    border-bottom-left-radius: 4px;
-}
-
-.user-message {
-    background-color: var(--user-message-bg);
-    color: var(--text-color);
-    align-self: flex-end;
-    margin-left: auto;
-    border-bottom-right-radius: 4px;
-}
-
-.chat-input-area {
-    display: flex;
-    gap: 10px;
-    padding-top: 15px;
-    border-top: 1px solid var(--chatbot-border);
-    transition: opacity 0.3s ease;
-}
-
-#user-input {
-    flex-grow: 1;
-    padding: 12px 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 25px;
-    font-size: 1em;
-    outline: none;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-#user-input:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-}
-
-/* Chatbot Minimized State */
-#chatbot-container.chatbot-minimized {
-    width: var(--chatbot-minimized-height); /* Make it a small square */
-    height: var(--chatbot-minimized-height);
-    padding: 0; /* Remove padding */
-    border-radius: 50%; /* Make it round */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-#chatbot-container.chatbot-minimized .chatbot-header {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute; /* Position header content within the minimized circle */
-    top: 0;
-    left: 0;
-}
-
-#chatbot-container.chatbot-minimized .chatbot-header h3 {
-    display: none; /* Hide title */
-}
-
-#chatbot-container.chatbot-minimized .chatbot-controls {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0; /* Remove gap */
-}
-
-#chatbot-container.chatbot-minimized #reset-website-btn {
-    display: none; /* Hide reset button */
-}
-
-#chatbot-container.chatbot-minimized #chatbot-toggle-btn {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    padding: 0;
-    background-color: var(--primary-color); /* Ensure button fills the minimized circle */
-    box-shadow: none; /* Remove extra shadow */
-}
-
-#chatbot-container.chatbot-minimized #chatbot-toggle-btn i {
-    transform: rotate(0deg); /* Reset icon rotation if any */
-    font-size: 1.5em; /* Make icon larger */
-}
-
-#chatbot-container.chatbot-minimized .chat-history,
-#chatbot-container.chatbot-minimized .chat-input-area {
-    opacity: 0; /* Hide these elements */
-    pointer-events: none; /* Disable interaction */
-    height: 0; /* Collapse height */
-    margin: 0; /* Remove margins */
-    padding: 0; /* Remove padding */
-}
-
-
-/* Loading indicator */
-.loading-dots {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 10px;
-}
-
-.loading-dots span {
-    width: 8px;
-    height: 8px;
-    background-color: var(--primary-color);
-    border-radius: 50%;
-    margin: 0 4px;
-    animation: bounce 0.6s infinite alternate;
-}
-
-.loading-dots span:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.loading-dots span:nth-child(3) {
-    animation-delay: 0.4s;
-}
-
-@keyframes bounce {
-    from {
-        transform: translateY(0);
-    }
-    to {
-        transform: translateY(-8px);
-    }
-}
-
-/* Responsive Design */
-@media (max-width: 992px) {
-    .container {
-        max-width: 95%;
-        padding: 0; /* Remove container padding on smaller screens */
-    }
-
-    #website-content {
-        padding-right: 20px; /* Reduce padding on main content */
-    }
-
-    /* Chatbot on smaller screens (e.g., tablets) */
-    #chatbot-container {
-        width: 300px; /* Slightly smaller width */
-        max-height: 70vh; /* More flexible height */
-        right: 15px;
-        bottom: 15px;
-    }
-
-    #chatbot-container.chatbot-minimized {
-        right: 15px;
-        bottom: 15px;
-    }
-}
-
-@media (max-width: 768px) {
-    body {
-        padding: 10px; /* Less padding on body */
-    }
-
-    .container {
-        max-width: 100%;
-        border-radius: 0; /* No border-radius for full-width content */
-        box-shadow: none; /* No shadow for full-width content */
-    }
-
-    #website-content {
-        padding-right: 0; /* No right padding on mobile */
-        min-height: calc(100vh - var(--chatbot-minimized-height) - 20px); /* Adjust height to account for chatbot at bottom */
-        border-radius: 0;
-    }
-
-    /* Chatbot becomes full-width at the bottom */
-    #chatbot-container {
-        width: 100%;
-        max-height: 70vh; /* Max height when open */
-        bottom: 0;
-        left: 0;
-        right: 0;
-        border-radius: 12px 12px 0 0; /* Rounded top corners */
-        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1); /* Shadow on top */
-        padding: 15px;
-    }
-
-    .chatbot-header {
-        margin-bottom: 15px;
-        padding-bottom: 10px;
-    }
-
-    .chat-history {
-        margin-bottom: 15px;
-    }
-
-    .chat-input-area {
-        padding-top: 10px;
-    }
-
-    /* Minimized chatbot on mobile */
-    #chatbot-container.chatbot-minimized {
-        width: 100%; /* Still full width */
-        height: var(--chatbot-minimized-height); /* Fixed height */
-        bottom: 0;
-        left: 0;
-        right: 0;
-        border-radius: 12px 12px 0 0; /* Rounded top corners */
-        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
-        padding: 0; /* No padding */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    #chatbot-container.chatbot-minimized .chatbot-header {
-        position: static; /* Reset position */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        height: 100%;
-        padding: 0;
-        margin: 0;
-        border-bottom: none;
-    }
-
-    #chatbot-container.chatbot-minimized .chatbot-header h3 {
-        display: block; /* Show title when minimized on mobile */
-        color: var(--header-text); /* Use header text color */
-        font-size: 1.2em;
-        margin-right: 10px; /* Space between title and toggle button */
-    }
-
-    #chatbot-container.chatbot-minimized .chatbot-controls {
-        position: static; /* Reset position */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: auto;
-        height: auto;
-    }
-
-    #chatbot-container.chatbot-minimized #chatbot-toggle-btn {
-        width: 40px; /* Fixed size for button */
-        height: 40px;
-        border-radius: 50%;
-        background-color: var(--primary-color);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
-
-    #chatbot-container.chatbot-minimized #chatbot-toggle-btn i {
-        font-size: 1.2em;
-    }
-}
-
----------------------------------------------------------------------------------------------
-
-make the website more responsive and smooth, improve the user experience, add ai chatbot creativity controller, fix the chatbot open and close behavior. Make the chatbot creative and intelligent. 
-
---- END FILE: data.txt ---
-
 --- START FILE: index.html ---
 
 <!DOCTYPE html>
@@ -1391,14 +91,13 @@ make the website more responsive and smooth, improve the user experience, add ai
 </body>
 </html>
 
-
 --- END FILE: index.html ---
 
 --- START FILE: script.js ---
 
 // Gemini API Configuration
 const API_KEY = "AIzaSyCzx6ReMk8ohPJcCjGwHHzu7SvFccJqAbA"; // Your Gemini API Key
-const MODEL_NAME = "gemini-2.5-flash-preview-05-20";
+const MODEL_NAME = "gemini-2.5-flash-preview-09-2025";
 
 // DOM Elements
 const websiteContent = document.getElementById('website-content');
@@ -1582,9 +281,9 @@ function resetWebsite() {
     websiteConfig = {
         sections: [
             { id: 'default-header', type: 'header', content: { title: 'ShapeShift AI', nav: ['Home', 'About', 'Services', 'Contact'] }, styles: {} },
-            { id: 'default-hero', type: 'hero', content: { title: 'Your Vision, Our Canvas', subtitle: 'Tell me what you want, and I\'ll build your website instantly.', buttonText: 'Get Started' }, styles: {} },
+            { id: 'default-hero', type: 'hero', content: { title: 'Your Vision', subtitle: 'Our Canvas', buttonText: 'Get Started' }, styles: {} },
             { id: 'default-about', type: 'text', content: { title: 'About This Project', text: 'This is an AI-powered website builder. Interact with the chatbot to add sections, change styles, and customize your site. All changes are saved locally!' }, styles: {} },
-            { id: 'default-footer', type: { text: '&copy; 2023 ShapeShift AI. All rights reserved.' }, styles: {} } // Fixed: content was missing
+            { id: 'default-footer', type: 'footer', content: { text: '&copy; 2023 ShapeShift AI. All rights reserved.' }, styles: {} } // Corrected footer type
         ],
         globalStyles: {
             '--primary-color': '#007bff',
@@ -1649,116 +348,135 @@ async function sendMessageToGemini(message) {
     showLoading();
     try {
         const websiteConfigJson = JSON.stringify(websiteConfig, null, 2);
-        // Escape backticks within the stringified JSON to prevent premature template literal termination
         const escapedWebsiteConfigForPrompt = websiteConfigJson.replace(/`/g, '\\`');
+
+        // Enhanced System Prompt for creativity and intelligence
+        const systemPrompt = `You are an expert AI website design assistant, not just a command interpreter. Your goal is to understand the user's *intent* to build and modify their website, offering creative suggestions, anticipating needs, and making the website aesthetically pleasing and user-friendly.
+
+You will always respond with a valid JSON object or an array of JSON objects representing actions for the frontend JavaScript. If a user's request implies multiple distinct actions, you *must* return an array of instruction objects.
+
+Here are the available actions and their JSON formats:
+
+1.  **Add a new section:**
+    \`\`\`json
+    {
+        "action": "addSection",
+        "type": "header" | "hero" | "text" | "image-gallery" | "footer",
+        "position": "top" | "bottom" | "before:[sectionId]" | "after:[sectionId]", // Optional, default "bottom"
+        "content": { ... }, // Content specific to the section type
+        "styles": { ... } // CSS properties for the section
+    }
+    \`\`\`
+    *   **header content:** '{ "title": "Site Name", "nav": ["Link1", "Link2"] }'
+    *   **hero content:** '{ "title": "Main Title", "subtitle": "Sub text", "buttonText": "Action" }'
+    *   **text content:** '{ "title": "Section Title", "text": "Paragraph content" }'
+    *   **image-gallery content:** '{ "title": "Gallery Title", "images": [{ "src": "url", "alt": "desc", "caption": "text" }] }'
+    *   **footer content:** '{ "text": "Copyright info" }'
+
+2.  **Update an existing section:**
+    \`\`\`json
+    {
+        "action": "updateSection",
+        "id": "[sectionId]", // The ID of the section to update (e.g., "default-hero", "section-170123...")
+        "content": { ... }, // Partial content to update
+        "styles": { ... } // Partial CSS properties to update
+    }
+    \`\`\`
+
+3.  **Remove a section:**
+    \`\`\`json
+    {
+        "action": "removeSection",
+        "id": "[sectionId]" // The ID of the section to remove
+    }
+    \`\`\`
+
+4.  **Update global CSS variables:**
+    \`\`\`json
+    {
+        "action": "updateGlobalStyles",
+        "styles": {
+            "--variable-name": "value",
+            "--another-variable": "another-value"
+        }
+    }
+    \`\`\`
+    *   Common variables: '--primary-color', '--background-color', '--text-color', '--header-bg', '--header-text', '--footer-bg', '--footer-text', '--font-family'.
+
+5.  **Reorder sections:**
+    \`\`\`json
+    {
+        "action": "orderSections",
+        "order": ["[sectionId1]", "[sectionId2]", "...", "[sectionIdN]"] // An array of ALL section IDs in their desired new order.
+    }
+    \`\`\`
+    *   The 'order' array should ideally contain all current section IDs. Sections not included in the 'order' array will be appended at the end.
+
+6.  **Acknowledge/Inform (if no direct modification is needed or possible, or for creative suggestions):**
+    \`\`\`json
+    {
+        "action": "inform",
+        "message": "A friendly, helpful, or creative message."
+    }
+    \`\`\`
+
+**Important Rules for Creative & Intelligent Responses:**
+*   **Always respond with valid JSON.** If a request implies multiple distinct actions, you *must* return an array of instruction objects. Example: \`[ { "action": "updateGlobalStyles", ... }, { "action": "addSection", ... } ]\`
+*   Do not include any text outside the JSON object(s).
+*   **Infer IDs:** If a section ID is not explicitly provided for update/remove/order, try to infer it from the request (e.g., "the hero section" implies "default-hero", "the first text section" implies the earliest text section). If unsure, ask for clarification or provide a creative "inform" message.
+*   **Placeholder Content:** For image galleries, use placeholder image URLs like 'https://via.placeholder.com/300x200?text=Image1'.
+*   **Unique IDs:** When adding a section, you only need to specify the 'type' for a new section, and the frontend will generate a unique ID. Do not try to generate IDs yourself in the JSON response.
+*   **Color/Font Choices:** If the user asks for a color or font, suggest modern, aesthetically pleasing options (e.g., hex codes, common font families).
+*   **Creative Suggestions:** If a user's request is vague or general (e.g., "make it better," "add more content," "make it look professional"), provide a creative "inform" message suggesting specific actions they could take, or propose an 'addSection' or 'updateGlobalStyles' action to improve the design.
+*   **Error Handling (AI's side):** If you cannot fulfill a request directly, provide a helpful and encouraging 'inform' message explaining why and offering alternatives or asking for clarification.
+*   **Focus on the Goal:** Help the user build and refine their website efficiently and creatively.
+
+**Current Website Configuration (for context, DO NOT modify this directly in your response, only use it for understanding the current state):**
+\`\`\`json
+${escapedWebsiteConfigForPrompt}
+\`\`\`
+
+User request: ${message}
+`;
+
+        const requestBody = {
+            contents: [{ parts: [{ text: systemPrompt }] }]
+        };
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: `You are an AI website design assistant. Your goal is to help the user build and modify their website.
-                        The user will describe changes they want. You must respond with a JSON object containing instructions for the frontend JavaScript to execute.
-                        
-                        Here are the available actions and their JSON formats:
-
-                        1.  **Add a new section:**
-                            \`\`\`json
-                            {
-                                "action": "addSection",
-                                "type": "header" | "hero" | "text" | "image-gallery" | "footer",
-                                "position": "top" | "bottom" | "before:[sectionId]" | "after:[sectionId]", // Optional, default "bottom"
-                                "content": { ... }, // Content specific to the section type
-                                "styles": { ... } // CSS properties for the section
-                            }
-                            \`\`\`
-                            *   **header content:** '{ "title": "Site Name", "nav": ["Link1", "Link2"] }'
-                            *   **hero content:** '{ "title": "Main Title", "subtitle": "Sub text", "buttonText": "Action" }'
-                            *   **text content:** '{ "title": "Section Title", "text": "Paragraph content" }'
-                            *   **image-gallery content:** '{ "title": "Gallery Title", "images": [{ "src": "url", "alt": "desc", "caption": "text" }] }'
-                            *   **footer content:** '{ "text": "Copyright info" }'
-
-                        2.  **Update an existing section:**
-                            \`\`\`json
-                            {
-                                "action": "updateSection",
-                                "id": "[sectionId]", // The ID of the section to update (e.g., "default-hero")
-                                "content": { ... }, // Partial content to update
-                                "styles": { ... } // Partial CSS properties to update
-                            }
-                            \`\`\`
-
-                        3.  **Remove a section:**
-                            \`\`\`json
-                            {
-                                "action": "removeSection",
-                                "id": "[sectionId]" // The ID of the section to remove
-                            }
-                            \`\`\`
-
-                        4.  **Update global CSS variables:**
-                            \`\`\`json
-                            {
-                                "action": "updateGlobalStyles",
-                                "styles": {
-                                    "--variable-name": "value",
-                                    "--another-variable": "another-value"
-                                }
-                            }
-                            \`\`\`
-                            *   Common variables: '--primary-color', '--background-color', '--text-color', '--header-bg', '--header-text', '--font-family'.
-
-                        5.  **Acknowledge/Inform (if no direct modification is needed or possible):**
-                            \`\`\`json
-                            {
-                                "action": "inform",
-                                "message": "Your request has been noted, but no direct modification was applied."
-                            }
-                            \`\`\`
-
-                        **Important Rules:**
-                        *   Always respond with a single, valid JSON object.
-                        *   Do not include any text outside the JSON object.
-                        *   If a section ID is not provided for update/remove, try to infer it from the request (e.g., "the hero section" implies "default-hero"). If unsure, ask for clarification or use "inform".
-                        *   For image galleries, use placeholder image URLs like 'https://via.placeholder.com/300x200?text=Image1'
-                        *   When adding a section, generate a unique ID for it.
-                        *   If the user asks for a color, try to use a valid CSS color name or hex code.
-                        *   If the user asks to change a font, provide a valid CSS font-family string.
-
-                        **Current Website Configuration (for context, do not modify this directly):**
-                        ${escapedWebsiteConfigForPrompt}
-
-                        User request: ${message}`
-                    }]
-                }]
-            })
+            body: JSON.stringify(requestBody)
         });
 
         const data = await response.json();
         hideLoading();
 
         if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
-            let botResponseText = data.candidates[0].content.parts[0].text; // Use 'let' to allow re-assignment
-            console.log("Gemini Raw Response:", botResponseText); // Debugging
+            let botResponseText = data.candidates[0].content.parts[0].text;
+            console.log("Gemini Raw Response:", botResponseText);
 
-            // --- NEW FIX: Strip Markdown code block if present ---
-            // This regex looks for a string starting with ```json (or just ```)
-            // followed by any characters (non-greedy), and ending with ```
+            // Strip Markdown code block if present
             const jsonCodeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/;
             const match = botResponseText.match(jsonCodeBlockRegex);
 
             if (match && match[1]) {
-                botResponseText = match[1].trim(); // Extract the content inside the code block and trim whitespace
-                console.log("Gemini Cleaned JSON:", botResponseText); // Debugging
+                botResponseText = match[1].trim();
+                console.log("Gemini Cleaned JSON:", botResponseText);
             }
-            // --- END NEW FIX ---
 
             try {
-                const instruction = JSON.parse(botResponseText);
-                applyGeminiInstruction(instruction);
+                const instructions = JSON.parse(botResponseText);
+                // Handle both single object and array of objects
+                if (Array.isArray(instructions)) {
+                    for (const instruction of instructions) {
+                        applyGeminiInstruction(instruction);
+                    }
+                } else {
+                    applyGeminiInstruction(instructions);
+                }
             } catch (jsonError) {
                 console.error("Failed to parse Gemini's JSON response:", jsonError);
                 addBotMessage("I received a response, but it wasn't in the expected format. Could you please rephrase your request?");
@@ -1802,10 +520,12 @@ function applyGeminiInstruction(instruction) {
                     const targetId = instruction.position.split(':')[1];
                     const targetIndex = websiteConfig.sections.findIndex(s => s.id === targetId);
                     if (targetIndex !== -1) insertIndex = targetIndex;
+                    else botMessage += ` (Note: Could not find target section '${targetId}' for 'before' position, adding to bottom.)`;
                 } else if (instruction.position.startsWith('after:')) {
                     const targetId = instruction.position.split(':')[1];
                     const targetIndex = websiteConfig.sections.findIndex(s => s.id === targetId);
                     if (targetIndex !== -1) insertIndex = targetIndex + 1;
+                    else botMessage += ` (Note: Could not find target section '${targetId}' for 'after' position, adding to bottom.)`;
                 }
             }
             websiteConfig.sections.splice(insertIndex, 0, newSection);
@@ -1816,9 +536,11 @@ function applyGeminiInstruction(instruction) {
             const sectionToUpdate = websiteConfig.sections.find(s => s.id === instruction.id);
             if (sectionToUpdate) {
                 if (instruction.content) {
+                    // Deep merge for content properties, allowing partial updates
                     sectionToUpdate.content = { ...sectionToUpdate.content, ...instruction.content };
                 }
                 if (instruction.styles) {
+                    // Deep merge for styles properties
                     sectionToUpdate.styles = { ...sectionToUpdate.styles, ...instruction.styles };
                 }
                 botMessage = `Updated section with ID: ${instruction.id}.`;
@@ -1843,6 +565,36 @@ function applyGeminiInstruction(instruction) {
                 botMessage = "Applied global style changes.";
             } else {
                 botMessage = "No global styles provided to update.";
+            }
+            break;
+            
+        case 'orderSections':
+            if (instruction.order && Array.isArray(instruction.order)) {
+                const newOrder = [];
+                const existingSectionsMap = new Map(websiteConfig.sections.map(s => [s.id, s]));
+                
+                // Add sections in the specified order
+                for (const id of instruction.order) {
+                    if (existingSectionsMap.has(id)) {
+                        newOrder.push(existingSectionsMap.get(id));
+                        existingSectionsMap.delete(id); // Remove from map once added
+                    } else {
+                        console.warn(`Section ID '${id}' in orderSections instruction not found in current website config.`);
+                    }
+                }
+
+                // Add any remaining sections that were not in the 'order' array
+                // This ensures no sections are accidentally lost if not explicitly ordered.
+                existingSectionsMap.forEach(section => newOrder.push(section));
+
+                if (newOrder.length > 0) {
+                    websiteConfig.sections = newOrder;
+                    botMessage = `Sections reordered successfully.`;
+                } else {
+                    botMessage = `Could not reorder sections. No valid section IDs were provided in the order.`;
+                }
+            } else {
+                botMessage = "Invalid 'orderSections' instruction. 'order' array is missing or malformed.";
             }
             break;
 
@@ -1886,7 +638,7 @@ chatbotToggleBtn.addEventListener('click', () => {
 
     if (isMinimized) {
         toggleIcon.classList.remove('fa-minus');
-        toggleIcon.classList.add('fa-comment-dots'); // Or fa-plus, fa-message, etc.
+        toggleIcon.classList.add('fa-comment-dots'); // Changed icon for minimized state
         chatbotToggleBtn.title = "Maximize Chatbot";
     } else {
         toggleIcon.classList.remove('fa-comment-dots');
@@ -2339,7 +1091,7 @@ body {
 }
 
 #chatbot-container.chatbot-minimized .chatbot-header h3 {
-    display: none; /* Hide title */
+    display: none; /* Hide title by default when minimized on desktop */
 }
 
 #chatbot-container.chatbot-minimized .chatbot-controls {
@@ -2539,9 +1291,4 @@ body {
     }
 }
 
-
 --- END FILE: style.css ---
-
-------------------------------------------------------------------------------------------------------------------------------------------------
-
-i want to max out the website editing capabilities of this website. please do it.
