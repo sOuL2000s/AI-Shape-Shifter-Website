@@ -1,6 +1,3 @@
-
---- START FILE: index.html ---
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -90,10 +87,6 @@
     <script src="script.js"></script>
 </body>
 </html>
-
---- END FILE: index.html ---
-
---- START FILE: script.js ---
 
 // Gemini API Configuration
 const API_KEY = "AIzaSyCzx6ReMk8ohPJcCjGwHHzu7SvFccJqAbA"; // Your Gemini API Key
@@ -652,10 +645,6 @@ chatbotToggleBtn.addEventListener('click', () => {
 // --- Initial Load ---
 document.addEventListener('DOMContentLoaded', loadWebsiteState);
 
-
---- END FILE: script.js ---
-
---- START FILE: style.css ---
 
 /* Global Styles */
 :root {
@@ -1291,4 +1280,3 @@ body {
     }
 }
 
---- END FILE: style.css ---

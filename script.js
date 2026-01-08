@@ -1,6 +1,6 @@
-// Gemini API Configuration
-const API_KEY = "AIzaSyCzx6ReMk8ohPJcCjGwHHzu7SvFccJqAbA"; // Your Gemini API Key
-const MODEL_NAME = "gemini-2.5-flash-preview-09-2025";
+// Gemini API Configuration (Proxied)
+const PROXY_URL = "/.netlify/functions/gemini-proxy"; // Netlify Function Endpoint
+// API Key and Model Name are now securely handled server-side.
 
 // DOM Elements
 const websiteContent = document.getElementById('website-content');
@@ -245,7 +245,7 @@ function hideLoading() {
     }
 }
 
-// --- Gemini API Interaction ---
+// --- Gemini API Interaction (via Serverless Proxy) ---
 
 async function sendMessageToGemini(message) {
     showLoading();
@@ -346,7 +346,8 @@ User request: ${message}
             contents: [{ parts: [{ text: systemPrompt }] }]
         };
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`, {
+        // --- Fetch call updated to use the local proxy URL ---
+        const response = await fetch(PROXY_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -357,43 +358,51 @@ User request: ${message}
         const data = await response.json();
         hideLoading();
 
-        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
-            let botResponseText = data.candidates[0].content.parts[0].text;
-            console.log("Gemini Raw Response:", botResponseText);
+        if (response.status !== 200) {
+            console.error("Serverless Function Error:", data);
+            addBotMessage(`An error occurred while contacting the AI proxy: ${data.error || 'Unknown server error'}`);
+            return;
+        }
 
-            // Strip Markdown code block if present
-            const jsonCodeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/;
-            const match = botResponseText.match(jsonCodeBlockRegex);
-
-            if (match && match[1]) {
-                botResponseText = match[1].trim();
-                console.log("Gemini Cleaned JSON:", botResponseText);
-            }
-
-            try {
-                const instructions = JSON.parse(botResponseText);
-                // Handle both single object and array of objects
-                if (Array.isArray(instructions)) {
-                    for (const instruction of instructions) {
-                        applyGeminiInstruction(instruction);
-                    }
-                } else {
-                    applyGeminiInstruction(instructions);
-                }
-            } catch (jsonError) {
-                console.error("Failed to parse Gemini's JSON response:", jsonError);
-                addBotMessage("I received a response, but it wasn't in the expected format. Could you please rephrase your request?");
-                addBotMessage(`Raw response: <pre>${botResponseText}</pre>`); // Show raw for debugging
-            }
-        } else {
+        // The serverless function returns the AI's response text within a 'text' property
+        let botResponseText = data.text; 
+        
+        if (!botResponseText) {
             addBotMessage("I couldn't get a clear response from the AI. Please try again.");
-            console.error("Gemini API response structure unexpected:", data);
+            return;
+        }
+
+        console.log("Gemini Raw Response:", botResponseText);
+
+        // Strip Markdown code block if present
+        const jsonCodeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/;
+        const match = botResponseText.match(jsonCodeBlockRegex);
+
+        if (match && match[1]) {
+            botResponseText = match[1].trim();
+            console.log("Gemini Cleaned JSON:", botResponseText);
+        }
+
+        try {
+            const instructions = JSON.parse(botResponseText);
+            // Handle both single object and array of objects
+            if (Array.isArray(instructions)) {
+                for (const instruction of instructions) {
+                    applyGeminiInstruction(instruction);
+                }
+            } else {
+                applyGeminiInstruction(instructions);
+            }
+        } catch (jsonError) {
+            console.error("Failed to parse Gemini's JSON response:", jsonError);
+            addBotMessage("I received a response, but it wasn't in the expected format. Could you please rephrase your request?");
+            addBotMessage(`Raw response: <pre>${botResponseText}</pre>`); // Show raw for debugging
         }
 
     } catch (error) {
         hideLoading();
-        console.error("Error communicating with Gemini API:", error);
-        addBotMessage("Oops! Something went wrong while talking to the AI. Please check your API key or try again later.");
+        console.error("Error communicating with AI Proxy:", error);
+        addBotMessage("Oops! Something went wrong while communicating with the serverless function. Please check your deployment logs.");
     }
 }
 
